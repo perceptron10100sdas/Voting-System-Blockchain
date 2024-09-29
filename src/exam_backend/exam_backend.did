@@ -1,3 +1,40 @@
+type Proposal = record {
+    description : text;
+    approve : nat32;
+    reject : nat32;
+    pass : nat32;
+    is_active : bool;
+    voted : vec principal;
+    owner : principal;
+};
+
+type CreateProposal = record {
+    description : text;
+    is_active : bool;
+};
+
+type VoteTypes = variant {
+    Approve;
+    Reject;
+    Pass;
+};
+
+type VoteError = variant {
+    AlreadyVoted;
+    ProposalNotActive;
+    Unauthorized;
+    NoProposal;
+    UpdateError;
+    VoteFailed;
+};
+
 service : {
-    "greet": (text) -> (text) query;
+    get_proposal : (nat64) -> (opt Proposal) query;
+    get_proposal_count : () -> (nat64) query;
+    create_proposal : (nat64, CreateProposal) -> (opt Proposal);
+    edit_proposal : (nat64, CreateProposal) -> (variant { Ok; Err : VoteError });
+    end_proposal : (nat64) -> (variant { Ok; Err : VoteError });
+    vote : (nat64, VoteTypes) -> (variant { Ok; Err : VoteError });
+    get_proposal_status : (nat64) -> (text) query;
+     "get_all_proposals": () -> (vec record { nat64; Proposal }) query;
 }
